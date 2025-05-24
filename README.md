@@ -1,5 +1,5 @@
 # vibe-template
-My approach to vibe coding
+My approach to vibe coding. Based on @vasumanmoza
 
 ## Basic sequence
 Use a non-reasoning ChatGPT or Claude model
