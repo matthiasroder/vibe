@@ -21,7 +21,7 @@ Use a non-reasoning ChatGPT or Claude model
       - Be incredibly small + testable
       - Have a clear start + end
       - Focus on one concern
-   I’ll be passing this off to an engineering LLM that will be told to complete one task at a time, allowing me to test in between.
+   I’ll be passing this off to an engineering LLM that will be told to complete one task at a time, allowing me to test in between. Do not use icons or emoticons.
    ```
 
 4. claude.md
