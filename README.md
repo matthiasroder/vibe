@@ -11,6 +11,7 @@ Use a non-reasoning ChatGPT or Claude model
       - File + folder structure
       - What each part does
       - Where state lives, how services connect Format this entire document in markdown.
+   Do not use icons or emoticons.
    ```
 
 3. tasks.md
