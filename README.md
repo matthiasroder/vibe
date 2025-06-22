@@ -43,6 +43,6 @@ Use a non-reasoning ChatGPT or Claude model
    ```
    You’re an engineer building this codebase. You've been given architecture.md, tasks.md and claude.md
       - Read all three of them carefully. There should be no ambiguity about what we’re building.
-      - Follow http://tasks.md and complete one task at a time.
+      - Follow tasks.md and complete one task at a time.
       - After each task, stop. I’ll test it. If it works, commit to GitHub and move to the next task.
    ```
