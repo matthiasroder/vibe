@@ -10,7 +10,8 @@ Use a non-reasoning ChatGPT or Claude model
    I’m building a [detailed description of your product]. Use [list of tools]. Give me the full architecture:
       - File + folder structure
       - What each part does
-      - Where state lives, how services connect Format this entire document in markdown.
+      - Where state lives, how services connect.
+   Format this entire document in markdown.
    Do not use icons or emoticons.
    ```
 
