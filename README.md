@@ -38,7 +38,7 @@ Use a non-reasoning ChatGPT or Claude model
    - If I need to do anything (e.g. bash/python etc.), tell me clearly
    ```
    
-5. In claude:
+5. In opencode:
 
    ```
    You’re an engineer building this codebase. You've been given architecture.md, tasks.md and claude.md
