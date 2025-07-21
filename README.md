@@ -25,7 +25,7 @@ Use a non-reasoning ChatGPT or Claude model
    I’ll be passing this off to an engineering LLM that will be told to complete one task at a time, allowing me to test in between. Do not use icons or emoticons.
    ```
 
-4. claude.md
+4. agents.md
 
    ```
    # Engineering Principles
