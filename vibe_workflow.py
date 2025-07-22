@@ -9,8 +9,7 @@ This script generates the markdown files for the vibe coding workflow:
 4. Copies agents.md with project-specific information
 5. Creates initial_prompt.md for the AI coding assistant
 
-Usage: python vibe_workflow.py <output_dir> <product.md> <tools.md>
-"""
+Usage: python vibe_workflow.py <output_dir> <PRODUCT.md> <tools.md>"""
 
 import os
 import sys
@@ -85,39 +84,7 @@ I'll be passing this off to an engineering LLM that will be told to complete one
     def get_existing_agents_md(self) -> str:
         """Get the existing agents.md content from the template."""
         agents_path = Path(__file__).parent / "agents.md"
-        if agents_path.exists():
-            return agents_path.read_text()
-        else:
-            # Fallback content if agents.md doesn't exist
-            return """# AGENTS.md - Coding Agent Guidelines
-
-## Build/Test Commands
-- No package.json found - this is a template/documentation repository
-- No specific build or test commands available
-- Check for project-specific build files when implementing actual projects
-
-## Engineering Principles
-- Write the absolute minimum code required
-- No sweeping changes
-- No unrelated edits
-- Focus on just the task you're on
-- Make code precise, modular, testable
-- Don't break existing functionality
-- If I need to do anything (e.g. bash/python etc.), tell me clearly
-
-## Code Style Guidelines
-- Follow existing patterns in the codebase
-- Use clear, descriptive naming conventions
-- Keep functions small and focused on single concerns
-- Prefer explicit over implicit code
-- No comments unless absolutely necessary for complex logic
-- Test each small change before moving to the next task
-
-## Workflow
-- Read architecture.md and tasks.md before starting
-- Complete one task at a time from tasks.md
-- Stop after each task for testing/validation
-- Commit only when explicitly requested"""
+        return agents_path.read_text()
 
     def create_initial_prompt(self) -> str:
         """Create the initial prompt for the AI coding assistant."""
@@ -162,9 +129,9 @@ I'll be passing this off to an engineering LLM that will be told to complete one
 
 def main():
     if len(sys.argv) != 4:
-        print("Usage: python vibe_workflow.py <output_dir> <product.md> <tools.md>")
+        print("Usage: python vibe_workflow.py <output_dir> <PRODUCT.md> <tools.md>")
         print("\nExample:")
-        print("  python vibe_workflow.py ./my-project product.md tools.md")
+        print("  python vibe_workflow.py ./my-project PRODUCT.md tools.md")
         sys.exit(1)
 
     output_dir = sys.argv[1]
