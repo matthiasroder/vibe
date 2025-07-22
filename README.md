@@ -1,4 +1,4 @@
-# vibe-template
+# vibe
 My approach to vibe coding. Based on @vasumanmoza
 
 ## Basic sequence
