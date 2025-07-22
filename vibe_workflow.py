@@ -3,36 +3,37 @@
 Vibe Template Workflow - Markdown Generator
 
 This script generates the markdown files for the vibe coding workflow:
-1. Takes product description and tools list as input
-2. Generates architecture.md using an LLM
+1. Takes product description and tools list as input (from .md files)
+2. Generates architecture.md using OpenAI
 3. Creates tasks.md based on the architecture
-4. Updates agents.md with project-specific information
+4. Copies agents.md with project-specific information
+
+Usage: python vibe_workflow.py <output_dir> <product.md> <tools.md>
 """
 
 import os
 import sys
-import argparse
 from pathlib import Path
 from typing import Optional
-
-# You'll need to install: pip install openai anthropic
-# Uncomment and configure based on your LLM choice
-# import openai
-# from anthropic import Anthropic
+import openai
 
 class VibeWorkflow:
-    def __init__(self, product_file: str, tools_file: str, output_dir: str = "."):
+    def __init__(self, output_dir: str, product_file: str, tools_file: str):
+        self.output_dir = Path(output_dir)
         self.product_file = Path(product_file)
         self.tools_file = Path(tools_file)
-        self.output_dir = Path(output_dir)
+        
+        # Set up OpenAI
+        self.client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        if not os.getenv("OPENAI_API_KEY"):
+            raise ValueError("OPENAI_API_KEY environment variable not set")
         
         # Read input files
         self.product_description = self._read_file(self.product_file)
         self.tools_list = self._read_file(self.tools_file)
         
         # Ensure output directory exists
-        if self.output_dir != Path("."):
-            self.output_dir.mkdir(parents=True, exist_ok=True)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
     
     def _read_file(self, filepath: Path) -> str:
         """Read content from a file."""
@@ -67,34 +68,18 @@ Write a granular step-by-step plan to build the MVP. Each task should:
    - Focus on one concern
 I'll be passing this off to an engineering LLM that will be told to complete one task at a time, allowing me to test in between. Do not use icons or emoticons."""
     
-    def call_llm(self, prompt: str, model: str = "gpt-4") -> str:
-        """
-        Call the LLM API with the given prompt.
-        
-        This is a placeholder - implement based on your LLM choice.
-        Options:
-        1. OpenAI API (GPT-4, GPT-3.5)
-        2. Anthropic API (Claude)
-        3. Local LLM via Ollama
-        4. Other LLM providers
-        """
-        # Example implementation for OpenAI:
-        # openai.api_key = os.getenv("OPENAI_API_KEY")
-        # response = openai.ChatCompletion.create(
-        #     model=model,
-        #     messages=[{"role": "user", "content": prompt}],
-        #     temperature=0.7
-        # )
-        # return response.choices[0].message.content
-        
-        # For now, return a placeholder
-        print(f"\n{'='*60}")
-        print("LLM PROMPT:")
-        print(f"{'='*60}")
-        print(prompt)
-        print(f"{'='*60}\n")
-        
-        return f"[LLM Response would go here for: {model}]"
+    def call_llm(self, prompt: str) -> str:
+        """Call OpenAI API with the given prompt using gpt-4o-mini."""
+        try:
+            response = self.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            print(f"Error calling OpenAI API: {e}")
+            sys.exit(1)
     
     def get_existing_agents_md(self) -> str:
         """Get the existing agents.md content from the template."""
@@ -133,7 +118,7 @@ I'll be passing this off to an engineering LLM that will be told to complete one
 - Stop after each task for testing/validation
 - Commit only when explicitly requested"""
     
-    def run(self, use_llm: bool = False) -> None:
+    def run(self) -> None:
         """Execute the vibe workflow to generate markdown files."""
         print(f"Vibe Workflow - Generating Markdown Files")
         print(f"Product: {self.product_description[:50]}...")
@@ -143,19 +128,13 @@ I'll be passing this off to an engineering LLM that will be told to complete one
         # Step 1: Generate architecture.md
         print("Step 1: Generating architecture.md...")
         arch_prompt = self.generate_architecture_prompt()
-        if use_llm:
-            architecture = self.call_llm(arch_prompt)
-        else:
-            architecture = f"# Architecture\n\n## Product Description\n{self.product_description}\n\n## Tools\n{self.tools_list}\n\n[LLM will generate architecture here based on the prompt below]\n\n---\n**Prompt for LLM:**\n```\n{arch_prompt}\n```"
+        architecture = self.call_llm(arch_prompt)
         self._save_file("architecture.md", architecture)
         
         # Step 2: Generate tasks.md
         print("Step 2: Generating tasks.md...")
         tasks_prompt = self.generate_tasks_prompt(architecture)
-        if use_llm:
-            tasks = self.call_llm(tasks_prompt)
-        else:
-            tasks = f"# Tasks\n\n[LLM will generate tasks based on architecture.md]\n\n---\n**Prompt for LLM:**\n```\n{tasks_prompt}\n```"
+        tasks = self.call_llm(tasks_prompt)
         self._save_file("tasks.md", tasks)
         
         # Step 3: Copy/create agents.md
@@ -168,34 +147,22 @@ I'll be passing this off to an engineering LLM that will be told to complete one
         print("  - architecture.md")
         print("  - tasks.md") 
         print("  - agents.md")
-        print("\nNext steps:")
-        print("1. If not using --use-llm, manually run the prompts through your LLM")
-        print("2. Review and refine the generated content")
-        print("3. Use these files with your AI coding assistant")
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Generate markdown files for the vibe coding workflow",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  python vibe_workflow.py product.txt tools.txt
-  python vibe_workflow.py product.txt tools.txt --output ./docs
-  python vibe_workflow.py product.txt tools.txt --use-llm
-        """
-    )
+    if len(sys.argv) != 4:
+        print("Usage: python vibe_workflow.py <output_dir> <product.md> <tools.md>")
+        print("\nExample:")
+        print("  python vibe_workflow.py ./my-project product.md tools.md")
+        sys.exit(1)
     
-    parser.add_argument("product_file", help="File containing product description")
-    parser.add_argument("tools_file", help="File containing list of tools")
-    parser.add_argument("--output", "-o", default=".", help="Output directory (default: current directory)")
-    parser.add_argument("--use-llm", action="store_true", help="Use LLM API to generate content (requires API setup)")
-    
-    args = parser.parse_args()
+    output_dir = sys.argv[1]
+    product_file = sys.argv[2]
+    tools_file = sys.argv[3]
     
     try:
-        workflow = VibeWorkflow(args.product_file, args.tools_file, args.output)
-        workflow.run(use_llm=args.use_llm)
+        workflow = VibeWorkflow(output_dir, product_file, tools_file)
+        workflow.run()
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
